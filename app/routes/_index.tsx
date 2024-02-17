@@ -102,12 +102,12 @@ export default function Index() {
       <h1>Morse Code Typing</h1>
 
       <div className="relative min-h-36 m-auto flex items-center">
-        <p className="text-3xl overflow-clip text-nowrap absolute right-1/2 -translate-x-[75px]">
+        <p className="text-3xl overflow-clip text-nowrap whitespace-nowrap absolute right-1/2 -translate-x-[75px]">
           {text}
         </p>
-        <div className="flex bg-sky-300 items-center gap-4 font-bold text-nowrap absolute left-1/2 -translate-x-[60px] p-3 pl-5 rounded-3xl">
+        <div className="flex bg-sky-300 items-center gap-4 font-bold text-nowrap whitespace-nowrap absolute left-1/2 -translate-x-[60px] p-3 pl-5 rounded-3xl">
           <p className="text-9xl z-10">{quest[0]}</p>
-          <p className="text-7xl z-10 text-nowrap">{quest.slice(1)}</p>
+          <p className="text-7xl z-10 text-nowrap whitespace-nowrap">{quest.slice(1)}</p>
         </div>
       </div>
 
