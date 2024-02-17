@@ -35,7 +35,8 @@ export const morseToText: { [key: string]: string } = {
     "---..": "8",
     "----.": "9",
     "-----": "0",
-    "": "", // Space
+    "": "", // string of length 0
+    " ": " ", // Space
 };
 
 
@@ -76,5 +77,6 @@ export const textToMorse: { [key: string]: string } = {
     8: "---..",
     9: "----.",
     0: "-----",
-    "": "", // Space
+    "": "", // string of length 0
+    " ": " ", // Space
 };

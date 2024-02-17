@@ -7,6 +7,8 @@ import { useDebounce } from "~/utils/useDebounce";
 import { clsx } from "clsx";
 import * as Tone from "tone";
 import { dah, dit } from "~/ui/sound";
+import { MorseHint } from "~/ui/hint";
+import { CharScore } from "~/utils/calculation";
 
 export const meta: MetaFunction = () => {
   return [
@@ -24,7 +26,7 @@ export default function Index() {
   const [text, setText] = useState("");
   const [quest, setQuest] = useState(
     //"SOS ABCD EFGH IJKL MNOP QRST UVWX YZ 1234 5678 90"
-    "ETETETETETETETETETETETETETETETETETETETETE"
+    "FOX PARIS ABCD EFGH IJKL MNOP QRST UVWX YZ 1234 5678 90"
   );
   const [score, setScore] = useState(0);
   const [showHint, setShowHint] = useState(false);
@@ -44,7 +46,6 @@ export default function Index() {
     const handleKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
       if (e.key !== "." && e.key !== "-") return;
-      console.log("key down");
       setMorse((prev) => prev + e.key);
       if (e.key === ".") {
         dit();
@@ -54,7 +55,6 @@ export default function Index() {
     };
     const handleKeyUp = (e: KeyboardEvent) => {
       e.preventDefault();
-      console.log("key up");
     };
     document.addEventListener("keydown", handleKeyDown, false);
     document.addEventListener("keyup", handleKeyUp, false);
@@ -76,46 +76,60 @@ export default function Index() {
 
   //post input action (score counting + quest advancing)
   useEffect(() => {
-    console.log(text.slice(-1));
     if (!text || !quest) return;
     if (text.slice(-1) === quest[0]) {
-      setScore((prev) => prev + 1);
-      setQuest((prev) => prev.slice(1));
+      //count score
+      setScore((prev) => prev + CharScore(quest[0]));
+
+      //advance text
+      setQuest((prev) => {
+        const next = prev.slice(1);
+        //passing over space
+        if (next && next[0] === " ") {
+          setText((prev) => prev + " ");
+          setScore((prev) => prev + 2); // why is this line triggered twice?
+        }
+        return next.trimStart();
+      });
     } else {
+      // wrong input
       setShowHint(true);
     }
   }, [text]);
 
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+    <div className="font-mono flex flex-col overflow-x-hidden justify-around h-screen">
       <h1>Morse Code Typing</h1>
 
-      <p className="text-3xl overflow-clip text-nowrap absolute top-1/3 right-1/2 -translate-y-1/2">
-        {text}
-      </p>
-      <div className="flex items-center gap-4 font-bold text-nowrap absolute top-1/3 left-1/2 -translate-y-1/2">
-        <div className="bg-sky-300 w-24 h-32 absolute"></div>
-        <p className="text-9xl z-10">{quest[0]}</p>
-        <p className="text-7xl z-10">{quest.slice(1)}</p>
-      </div>
-
-      <div
-        className={clsx(
-          "absolute top-1/2 left-1/2 translate-y-1/2 bg-sky-200 rounded-3xl px-6",
-          { hidden: !showHint }
-        )}
-      >
-        <p className="flex items-center gap-6">
-          Hint:
-          <span className="text-8xl text-orange-700">
-            {textToMorse[quest[0]]}
-          </span>
+      <div className="relative min-h-36 m-auto flex items-center">
+        <p className="text-3xl overflow-clip text-nowrap absolute right-1/2 -translate-x-[75px]">
+          {text}
         </p>
+        <div className="flex bg-sky-300 items-center gap-4 font-bold text-nowrap absolute left-1/2 -translate-x-[60px] p-3 pl-5 rounded-3xl">
+          <p className="text-9xl z-10">{quest[0]}</p>
+          <p className="text-7xl z-10 text-nowrap">{quest.slice(1)}</p>
+        </div>
       </div>
 
-      <p className="text-9xl text-nowrap absolute top-2/3 left-1/2 -translate-1/2 ">
-        {morse}
-      </p>
+      <div className="z-10">
+        <MorseHint
+          currentChar={quest[0]}
+          showHint={showHint}
+          setShowHint={setShowHint}
+        />
+      </div>
+
+      <div className="w-full flex justify-center min-h-32">
+        <p className="text-9xl text-nowrap">{morse}</p>
+        {!(morse || text) && (
+          <p className="">
+            <span className="mx-4">start typing with</span>
+            <kbd className="kbd kbd-lg">.</kbd>
+            <span className="mx-4">or</span>
+            <kbd className="kbd kbd-lg">-</kbd>
+          </p>
+        )}
+      </div>
 
       <p>{score}</p>
     </div>
