@@ -7,6 +7,7 @@ interface CardProps {
   setShowHint: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+
 export function MorseHint({ currentChar, showHint, setShowHint }: CardProps) {
   return (
     <div className="flex flex-col justify-center items-center">
